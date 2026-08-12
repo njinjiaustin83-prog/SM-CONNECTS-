@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your SM CONNECTS account.">
+  <title>Join SM CONNECTS</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 40px 20px;
+    }
+
+    .auth-card {
+      width: min(100%, 520px);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 35px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
+    }
+
+    .auth-card h1 {
+      font-size: 2.4rem;
+      line-height: 1.05;
+      margin: 0 0 10px;
+    }
+
+    .auth-subtitle {
+      color: var(--muted);
+      margin-bottom: 30px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: white;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: 2px solid #e84b7a55;
+      border-color: #e84b7a;
+    }
+
+    .terms {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: .9rem;
+      color: var(--muted);
+      margin: 20px 0;
+    }
+
+    .terms input {
+      margin-top: 4px;
+    }
+
+    .auth-button {
+      width: 100%;
+      border: 0;
+      padding: 15px;
+      border-radius: 14px;
+      background: #17151b;
+      color: white;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .auth-button:hover {
+      opacity: .9;
+    }
+
+    .message {
+      display: none;
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 12px;
+      background: #fff0f4;
+      color: #9c214d;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 25px;
+      color: var(--muted);
+    }
+
+    .login-link a {
+      color: #e84b7a;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 25px;
+      color: #17151b;
+      text-decoration: none;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="nav">
+    <a class="brand" href="index.html">
+      SM <span>CONNECTS</span>
+    </a>
+  </header>
+
+  <main class="auth-page">
+
+    <section class="auth-card">
+
+      <a class="back" href="index.html">← Back to SM CONNECTS</a>
+
+      <p class="eyebrow">Create your account</p>
+
+      <h1>Start connecting.</h1>
+
+      <p class="auth-subtitle">
+        Join SM CONNECTS and discover people around the world.
+      </p>
+
+      <form id="signupForm">
+
+        <div class="field">
+          <label for="name">Your name</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Enter your name"
+            autocomplete="name"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="email">Email address</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="country">Country</label>
+          <select id="country" name="country" required>
+            <option value="">Select your country</option>
+            <option>Nigeria</option>
+            <option>Ghana</option>
+            <option>Kenya</option>
+            <option>South Africa</option>
+            <option>United Kingdom</option>
+            <option>United States</option>
+            <option>Canada</option>
+            <option>Australia</option>
+            <option>Germany</option>
+            <option>France</option>
+            <option>Italy</option>
+            <option>Spain</option>
+            <option>India</option>
+            <option>Japan</option>
+            <option>Brazil</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="password">Create password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="At least 8 characters"
+            minlength="8"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm password</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            placeholder="Enter password again"
+            minlength="8"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <label class="terms">
+          <input type="checkbox" id="terms" required>
+          <span>
+            I agree to the SM CONNECTS Terms of Service and Privacy Policy.
+          </span>
+        </label>
+
+        <button class="auth-button" type="submit">
+          Create my account
+        </button>
+
+        <div class="message" id="message"></div>
+
+      </form>
+
+      <p class="login-link">
+        Already have an account?
+        <a href="login.html">Log in</a>
+      </p>
+
+    </section>
+
+  </main>
+
+  <script>
+    const form = document.getElementById("signupForm");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) {
+        message.style.display = "block";
+        message.textContent = "Your passwords do not match.";
+        return;
+      }
+
+      message.style.display = "block";
+      message.textContent =
+        "Account details received. Email verification will be connected when the SM CONNECTS backend and SMTP service are configured.";
+    });
+  </script>
+
+</body>
+</html>feat: add SM CONNECTS signup page
