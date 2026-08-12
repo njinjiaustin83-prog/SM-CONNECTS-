@@ -1,4 +1,16 @@
-const crypto = require("crypto");"use strict";
+const crypto = require("crypto")
+const {
+  getUserByEmail,
+  getUserById,
+  createUser,
+  setEmailVerified,
+  saveProfile,
+  getProfile,
+  likeUser,
+  createMessage,
+  getMessages
+} = require("./database");
+;"use strict";
 
 require("dotenv").config();
 
