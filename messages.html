@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Messages on SM CONNECTS.">
+  <title>Messages — SM CONNECTS</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .messages-page {
+      max-width: 1150px;
+      margin: auto;
+      padding: 35px 20px 70px;
+    }
+
+    .messages-layout {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      height: 650px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 25px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0,0,0,.07);
+    }
+
+    .conversation-list {
+      border-right: 1px solid var(--line);
+      overflow-y: auto;
+    }
+
+    .conversation-header {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .conversation-header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    .conversation {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .conversation:hover,
+    .conversation.active {
+      background: #fff4f7;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(145deg,#f5d8df,#e8dcfa);
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .conversation-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .conversation-name {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .conversation-name strong {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .time {
+      color: var(--muted);
+      font-size: .75rem;
+    }
+
+    .preview {
+      color: var(--muted);
+      font-size: .85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 3px 0 0;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .chat-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .status {
+      color: #2b9b58;
+      font-size: .8rem;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #fffaf7;
+    }
+
+    .bubble {
+      max-width: 75%;
+      padding: 11px 15px;
+      border-radius: 17px;
+      font-size: .95rem;
+    }
+
+    .received {
+      align-self: flex-start;
+      background: #eee9ed;
+      border-bottom-left-radius: 5px;
+    }
+
+    .sent {
+      align-self: flex-end;
+      background: #e84b7a;
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message-time {
+      display: block;
+      font-size: .68rem;
+      opacity: .65;
+      margin-top: 4px;
+    }
+
+    .message-form {
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .message-form input {
+      flex: 1;
+      min-width: 0;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font: inherit;
+    }
+
+    .send-button {
+      border: 0;
+      border-radius: 999px;
+      background: #17151b;
+      color: white;
+      padding: 0 20px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    @media (max-width: 750px) {
+      .messages-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .conversation-list {
+        border-right: 0;
+        max-height: 280px;
+      }
+
+      .chat {
+        height: 560px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="nav">
+
+  <a class="brand" href="index.html">
+    SM <span>CONNECTS</span>
+  </a>
+
+  <nav>
+    <a href="discover.html">Discover</a>
+    <a href="profile.html">Profile</a>
+  </nav>
+
+</header>
+
+<main class="messages-page">
+
+  <div class="messages-layout">
+
+    <!-- CONVERSATIONS -->
+
+    <aside class="conversation-list">
+
+      <div class="conversation-header">
+        <h1>Messages</h1>
+      </div>
+
+      <button
+        class="conversation active"
+        data-name="Amara"
+        data-avatar="👩🏽"
+      >
+
+        <div class="avatar">👩🏽</div>
+
+        <div class="conversation-info">
+
+          <div class="conversation-name">
+            <strong>Amara</strong>
+            <span class="time">10:42</span>
+          </div>
+
+          <p class="preview">
+            That sounds great!
+          </p>
+
+        </div>
+
+      </button>
+
+      <button
+        class="conversation"
+        data-name="Kwame"
+        data-avatar="👨🏾"
+      >
+
+        <div class="avatar">👨🏾</div>
+
+        <div class="conversation-info">
+
+          <div class="conversation-name">
+            <strong>Kwame</strong>
+            <span class="time">Yesterday</span>
+          </div>
+
+          <p class="preview">
+            Have you visited Accra?
+          </p>
+
+        </div>
+
+      </button>
+
+      <button
+        class="conversation"
+        data-name="Zuri"
+        data-avatar="👩🏾"
+      >
+
+        <div class="avatar">👩🏾</div>
+
+        <div class="conversation-info">
+
+          <div class="conversation-name">
+            <strong>Zuri</strong>
+            <span class="time">Mon</span>
+          </div>
+
+          <p class="preview">
+            Nice to meet you!
+          </p>
+
+        </div>
+
+      </button>
+
+    </aside>
+
+    <!-- CHAT -->
+
+    <section class="chat">
+
+      <header class="chat-header">
+
+        <div class="avatar" id="chatAvatar">
+          👩🏽
+        </div>
+
+        <div>
+          <h2 id="chatName">Amara</h2>
+          <span class="status">
+            ● Online
+          </span>
+        </div>
+
+      </header>
+
+      <div
+        class="messages"
+        id="messages"
+      >
+
+        <div class="bubble received">
+          Hi! Nice to meet you 😊
+          <span class="message-time">
+            10:38
+          </span>
+        </div>
+
+        <div class="bubble sent">
+          Nice to meet you too!
+          <span class="message-time">
+            10:40
+          </span>
+        </div>
+
+        <div class="bubble received">
+          I saw that you like travelling.
+          Where would you love to visit next?
+          <span class="message-time">
+            10:42
+          </span>
+        </div>
+
+      </div>
+
+      <form
+        class="message-form"
+        id="messageForm"
+      >
+
+        <input
+          id="messageInput"
+          type="text"
+          maxlength="1000"
+          placeholder="Write a message..."
+          autocomplete="off"
+          required
+        >
+
+        <button
+          class="send-button"
+          type="submit"
+        >
+          Send
+        </button>
+
+      </form>
+
+    </section>
+
+  </div>
+
+</main>
+
+<script>
+
+const conversations =
+  document.querySelectorAll(".conversation");
+
+const chatName =
+  document.getElementById("chatName");
+
+const chatAvatar =
+  document.getElementById("chatAvatar");
+
+const messages =
+  document.getElementById("messages");
+
+const messageForm =
+  document.getElementById("messageForm");
+
+const messageInput =
+  document.getElementById("messageInput");
+
+
+/* SWITCH CONVERSATIONS */
+
+conversations.forEach(function(conversation) {
+
+  conversation.addEventListener("click", function() {
+
+    conversations.forEach(function(item) {
+      item.classList.remove("active");
+    });
+
+    conversation.classList.add("active");
+
+    chatName.textContent =
+      conversation.dataset.name;
+
+    chatAvatar.textContent =
+      conversation.dataset.avatar;
+
+    messages.innerHTML = "";
+
+    addMessage(
+      "Hi! Nice to meet you 😊",
+      "received"
+    );
+
+  });
+
+});
+
+
+/* SEND MESSAGE */
+
+messageForm.addEventListener(
+  "submit",
+  function(event) {
+
+    event.preventDefault();
+
+    const text =
+      messageInput.value.trim();
+
+    if (!text) return;
+
+    addMessage(text, "sent");
+
+    messageInput.value = "";
+
+    /*
+     * PRODUCTION VERSION:
+     *
+     * This message will be sent through the secure
+     * SM CONNECTS backend/realtime messaging service.
+     */
+
+  }
+);
+
+
+function addMessage(text, type) {
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className =
+    "bubble " + type;
+
+  const time =
+    new Date().toLocaleTimeString(
+      [],
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+  bubble.innerHTML =
+    escapeHtml(text) +
+    '<span class="message-time">' +
+    time +
+    '</span>';
+
+  messages.appendChild(bubble);
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
+}
+
+
+/* Prevent HTML injection in displayed messages */
+
+function escapeHtml(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+</html>feat: add SM CONNECTS messaging interface
