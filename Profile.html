@@ -3,536 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Create your SM CONNECTS dating profile.">
-  <title>Create Profile — SM CONNECTS</title>
+  <title>Create Profile | SM CONNECTS</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    .profile-page {
-      max-width: 850px;
-      margin: 0 auto;
-      padding: 50px 20px 80px;
-    }
-
-    .profile-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      padding: 35px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.07);
-    }
-
-    .profile-card h1 {
-      font-size: clamp(2.2rem, 5vw, 3.5rem);
-      line-height: 1;
-      margin: 0 0 12px;
-    }
-
-    .intro {
-      color: var(--muted);
-      margin-bottom: 35px;
-    }
-
-    .photo-area {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 35px;
-    }
-
-    .photo-preview {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #f5d8df, #e8dcfa);
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      font-size: 2.5rem;
-      flex-shrink: 0;
-    }
-
-    .photo-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .photo-button {
-      display: inline-block;
-      background: #17151b;
-      color: white;
-      padding: 11px 17px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    #photo {
-      display: none;
-    }
-
-    .section-title {
-      font-size: 1.25rem;
-      margin: 30px 0 18px;
-      padding-top: 25px;
-      border-top: 1px solid var(--line);
-    }
-
-    .field {
-      margin-bottom: 18px;
-    }
-
-    .field label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      font: inherit;
-      background: #fff;
-    }
-
-    textarea {
-      min-height: 130px;
-      resize: vertical;
-    }
-
-    .two-columns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .interests {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-    }
-
-    .interest input {
-      display: none;
-    }
-
-    .interest span {
-      display: inline-block;
-      padding: 9px 14px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      cursor: pointer;
-      color: var(--muted);
-      font-weight: 650;
-    }
-
-    .interest input:checked + span {
-      background: #17151b;
-      color: white;
-      border-color: #17151b;
-    }
-
-    .save-button {
-      width: 100%;
-      margin-top: 30px;
-      padding: 16px;
-      border: 0;
-      border-radius: 14px;
-      background: #e84b7a;
-      color: white;
-      font-weight: 850;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .status {
-      display: none;
-      padding: 14px;
-      margin-top: 18px;
-      border-radius: 12px;
-      background: #eefbf3;
-      color: #176b3a;
-    }
-
-    @media (max-width: 650px) {
-      .profile-card {
-        padding: 25px 18px;
-      }
-
-      .two-columns {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-
-      .photo-area {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-    }
-  </style>
 </head>
 
 <body>
 
-<header class="nav">
-  <a class="brand" href="index.html">
-    SM <span>CONNECTS</span>
-  </a>
-</header>
+  <main class="auth-container">
 
-<main class="profile-page">
+    <section class="auth-card">
 
-  <section class="profile-card">
+      <h1>Complete Your Profile</h1>
+      <p>Tell people a little about yourself.</p>
 
-    <p class="eyebrow">Your profile</p>
+      <form id="profileForm">
 
-    <h1>Tell people about you.</h1>
-
-    <p class="intro">
-      A great profile helps you find people with similar interests
-      and intentions.
-    </p>
-
-    <!-- PROFILE PHOTO -->
-    <div class="photo-area">
-
-      <div class="photo-preview" id="photoPreview">
-        📷
-      </div>
-
-      <div>
-        <label class="photo-button" for="photo">
-          Add profile photo
-        </label>
-
+        <label for="dateOfBirth">Date of birth</label>
         <input
-          id="photo"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
+          type="date"
+          id="dateOfBirth"
+          required
         >
 
-        <p style="color:var(--muted);font-size:.85rem;">
-          JPG, PNG or WebP. Choose a clear photo of yourself.
-        </p>
-      </div>
+        <label for="gender">I am</label>
+        <select id="gender" required>
+          <option value="">Select</option>
+          <option value="man">A man</option>
+          <option value="woman">A woman</option>
+          <option value="non-binary">Non-binary</option>
+          <option value="prefer-not-to-say">Prefer not to say</option>
+        </select>
 
-    </div>
+        <label for="interestedIn">Interested in</label>
+        <select id="interestedIn" required>
+          <option value="">Select</option>
+          <option value="men">Men</option>
+          <option value="women">Women</option>
+          <option value="everyone">Everyone</option>
+        </select>
 
-    <form id="profileForm">
+        <label for="country">Country</label>
+        <input
+          type="text"
+          id="country"
+          placeholder="Nigeria"
+          required
+        >
 
-      <!-- BASIC INFORMATION -->
+        <label for="state">State / Region</label>
+        <input
+          type="text"
+          id="state"
+          placeholder="State or region"
+          required
+        >
 
-      <h2 class="section-title">Basic information</h2>
+        <label for="city">City</label>
+        <input
+          type="text"
+          id="city"
+          placeholder="City"
+          required
+        >
 
-      <div class="two-columns">
-
-        <div class="field">
-          <label for="firstName">First name</label>
-          <input
-            id="firstName"
-            type="text"
-            maxlength="50"
-            required
-          >
-        </div>
-
-        <div class="field">
-          <label for="age">Age</label>
-          <input
-            id="age"
-            type="number"
-            min="18"
-            max="100"
-            placeholder="18+"
-            required
-          >
-        </div>
-
-      </div>
-
-      <div class="two-columns">
-
-        <div class="field">
-          <label for="gender">Gender</label>
-
-          <select id="gender" required>
-            <option value="">Select</option>
-            <option>Woman</option>
-            <option>Man</option>
-            <option>Non-binary</option>
-            <option>Prefer not to say</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="lookingFor">Looking for</label>
-
-          <select id="lookingFor" required>
-            <option value="">Select</option>
-            <option>Relationship</option>
-            <option>Dating</option>
-            <option>Friendship</option>
-            <option>Something serious</option>
-          </select>
-        </div>
-
-      </div>
-
-      <!-- LOCATION -->
-
-      <h2 class="section-title">Location</h2>
-
-      <div class="two-columns">
-
-        <div class="field">
-          <label for="country">Country</label>
-
-          <select id="country" required>
-            <option value="">Select country</option>
-            <option>Nigeria</option>
-            <option>Ghana</option>
-            <option>Kenya</option>
-            <option>South Africa</option>
-            <option>United Kingdom</option>
-            <option>United States</option>
-            <option>Canada</option>
-            <option>Australia</option>
-            <option>Germany</option>
-            <option>France</option>
-            <option>India</option>
-            <option>Japan</option>
-            <option>Brazil</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="city">City</label>
-
-          <input
-            id="city"
-            type="text"
-            placeholder="Your city"
-            maxlength="80"
-            required
-          >
-        </div>
-
-      </div>
-
-      <!-- ABOUT -->
-
-      <h2 class="section-title">About you</h2>
-
-      <div class="field">
-        <label for="bio">Your introduction</label>
-
+        <label for="bio">About me</label>
         <textarea
           id="bio"
+          rows="5"
           maxlength="500"
-          placeholder="Tell people a little about yourself..."
-          required
+          placeholder="Tell people something about yourself..."
         ></textarea>
 
-        <small style="color:var(--muted);">
-          Maximum 500 characters.
-        </small>
-      </div>
+        <label for="photo">Profile photo URL</label>
+        <input
+          type="url"
+          id="photo"
+          placeholder="https://example.com/photo.jpg"
+        >
 
-      <!-- INTERESTS -->
+        <button type="submit" id="saveButton">
+          Save Profile
+        </button>
 
-      <h2 class="section-title">Your interests</h2>
+        <p id="message"></p>
 
-      <div class="interests">
+      </form>
 
-        <label class="interest">
-          <input type="checkbox" value="Music">
-          <span>🎵 Music</span>
-        </label>
+    </section>
 
-        <label class="interest">
-          <input type="checkbox" value="Travel">
-          <span>✈️ Travel</span>
-        </label>
+  </main>
 
-        <label class="interest">
-          <input type="checkbox" value="Food">
-          <span>🍽️ Food</span>
-        </label>
+  <script>
+    const form = document.getElementById("profileForm");
+    const message = document.getElementById("message");
+    const saveButton = document.getElementById("saveButton");
 
-        <label class="interest">
-          <input type="checkbox" value="Fitness">
-          <span>💪 Fitness</span>
-        </label>
+    const storedUser =
+      localStorage.getItem("sm_connects_user");
 
-        <label class="interest">
-          <input type="checkbox" value="Movies">
-          <span>🎬 Movies</span>
-        </label>
+    if (!storedUser) {
+      message.textContent =
+        "Please create an account first.";
 
-        <label class="interest">
-          <input type="checkbox" value="Books">
-          <span>📚 Books</span>
-        </label>
-
-        <label class="interest">
-          <input type="checkbox" value="Gaming">
-          <span>🎮 Gaming</span>
-        </label>
-
-        <label class="interest">
-          <input type="checkbox" value="Nature">
-          <span>🌿 Nature</span>
-        </label>
-
-        <label class="interest">
-          <input type="checkbox" value="Photography">
-          <span>📸 Photography</span>
-        </label>
-
-        <label class="interest">
-          <input type="checkbox" value="Business">
-          <span>💼 Business</span>
-        </label>
-
-      </div>
-
-      <button class="save-button" type="submit">
-        Save my profile
-      </button>
-
-      <div class="status" id="status"></div>
-
-    </form>
-
-  </section>
-
-</main>
-
-<script>
-
-  /* PROFILE PHOTO PREVIEW */
-
-  const photoInput = document.getElementById("photo");
-  const photoPreview = document.getElementById("photoPreview");
-
-  photoInput.addEventListener("change", function() {
-
-    const file = this.files[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      alert("Please select an image file.");
-      this.value = "";
-      return;
+      saveButton.disabled = true;
     }
 
-    const reader = new FileReader();
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-    reader.onload = function(event) {
-      photoPreview.innerHTML =
-        '<img src="' +
-        event.target.result +
-        '" alt="Profile preview">';
-    };
+      if (!storedUser) {
+        return;
+      }
 
-    reader.readAsDataURL(file);
+      let user;
 
-  });
+      try {
+        user = JSON.parse(storedUser);
+      } catch (error) {
+        message.textContent =
+          "Your account session is invalid.";
+        return;
+      }
 
+      saveButton.disabled = true;
+      saveButton.textContent = "Saving...";
 
-  /* PROFILE FORM */
+      const profile = {
+        dateOfBirth:
+          document.getElementById("dateOfBirth").value,
 
-  const form = document.getElementById("profileForm");
-  const status = document.getElementById("status");
+        gender:
+          document.getElementById("gender").value,
 
-  form.addEventListener("submit", function(event) {
+        interestedIn:
+          document.getElementById("interestedIn").value,
 
-    event.preventDefault();
+        country:
+          document.getElementById("country").value.trim(),
 
-    const age =
-      Number(document.getElementById("age").value);
+        state:
+          document.getElementById("state").value.trim(),
 
-    const bio =
-      document.getElementById("bio").value.trim();
+        city:
+          document.getElementById("city").value.trim(),
 
-    const interests =
-      Array.from(
-        document.querySelectorAll(
-          ".interest input:checked"
-        )
-      ).map(input => input.value);
+        bio:
+          document.getElementById("bio").value.trim(),
 
-    if (age < 18) {
-      showStatus(
-        "SM CONNECTS is for adults aged 18 and over.",
-        false
-      );
-      return;
-    }
+        photo:
+          document.getElementById("photo").value.trim()
+      };
 
-    if (bio.length < 20) {
-      showStatus(
-        "Please write at least 20 characters about yourself.",
-        false
-      );
-      return;
-    }
+      try {
+        const response = await fetch(
+          `/api/profile/${encodeURIComponent(user.id)}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(profile)
+          }
+        );
 
-    if (interests.length < 1) {
-      showStatus(
-        "Choose at least one interest.",
-        false
-      );
-      return;
-    }
+        const data = await response.json();
 
-    /*
-     * PRODUCTION BACKEND
-     *
-     * This profile data will eventually be sent to
-     * the secure SM CONNECTS backend.
-     *
-     * The browser should NOT directly connect to
-     * a database using secret credentials.
-     */
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Unable to save profile."
+          );
+        }
 
-    showStatus(
-      "Your profile is ready. The secure backend will save it when authentication and database services are connected.",
-      true
-    );
+        message.textContent =
+          "Profile saved successfully!";
 
-  });
+        setTimeout(() => {
+          window.location.href = "discover.html";
+        }, 800);
 
+      } catch (error) {
+        message.textContent = error.message;
 
-  function showStatus(text, success) {
-
-    status.style.display = "block";
-
-    status.textContent = text;
-
-    if (success) {
-      status.style.background = "#eefbf3";
-      status.style.color = "#176b3a";
-    } else {
-      status.style.background = "#fff0f4";
-      status.style.color = "#9c214d";
-    }
-
-    status.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest"
+        saveButton.disabled = false;
+        saveButton.textContent = "Save Profile";
+      }
     });
-
-  }
-
-</script>
+  </script>
 
 </body>
-</html>feat: add SM CONNECTS profile creation
+</html>Connect profile creation to backend
