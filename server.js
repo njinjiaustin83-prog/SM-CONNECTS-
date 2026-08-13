@@ -1,367 +1,363 @@
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
-const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
 // --------------------------------------------------
-// Basic configuration
+// CONNECTION REQUESTS
 // --------------------------------------------------
 
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true }));
+const connectionsFile = path.join(
+  dataDir,
+  "connections.json"
+);
 
-// Serve the website files
-app.use(express.static(path.join(__dirname, "public")));
-
-// --------------------------------------------------
-// Simple local data storage
-// --------------------------------------------------
-
-const dataDir = path.join(__dirname, "data");
-const usersFile = path.join(dataDir, "users.json");
-
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(connectionsFile)) {
+  fs.writeFileSync(connectionsFile, "[]", "utf8");
 }
 
-if (!fs.existsSync(usersFile)) {
-  fs.writeFileSync(usersFile, "[]", "utf8");
-}
-
-function readUsers() {
+function readConnections() {
   try {
-    return JSON.parse(fs.readFileSync(usersFile, "utf8"));
+    return JSON.parse(
+      fs.readFileSync(connectionsFile, "utf8")
+    );
   } catch (error) {
-    console.error("Could not read users:", error);
+    console.error("Could not read connections:", error);
     return [];
   }
 }
 
-function saveUsers(users) {
+function saveConnections(connections) {
   fs.writeFileSync(
-    usersFile,
-    JSON.stringify(users, null, 2),
+    connectionsFile,
+    JSON.stringify(connections, null, 2),
     "utf8"
   );
 }
 
-// --------------------------------------------------
-// Health check
-// --------------------------------------------------
-
-app.get("/api/health", (req, res) => {
-  res.json({
-    success: true,
-    message: "SM CONNECTS server is running",
-    timestamp: new Date().toISOString()
-  });
-});
 
 // --------------------------------------------------
-// SIGN UP
+// SEND CONNECTION REQUEST
 // --------------------------------------------------
 
-app.post("/api/signup", async (req, res) => {
+app.post("/api/connections/request", (req, res) => {
   try {
     const {
-      name,
-      email,
-      password
+      senderId,
+      receiverId
     } = req.body;
 
-    if (!name || !email || !password) {
+    if (!senderId || !receiverId) {
       return res.status(400).json({
         success: false,
-        message: "Name, email and password are required."
+        message: "Sender and receiver are required."
       });
     }
 
-    if (password.length < 8) {
+    if (senderId === receiverId) {
       return res.status(400).json({
         success: false,
-        message: "Password must contain at least 8 characters."
+        message: "You cannot connect with yourself."
       });
     }
-
-    const normalizedEmail = email.trim().toLowerCase();
 
     const users = readUsers();
 
-    const existingUser = users.find(
-      user => user.email === normalizedEmail
+    const sender = users.find(
+      user => user.id === senderId
     );
 
-    if (existingUser) {
-      return res.status(409).json({
+    const receiver = users.find(
+      user => user.id === receiverId
+    );
+
+    if (!sender || !receiver) {
+      return res.status(404).json({
         success: false,
-        message: "An account with this email already exists."
+        message: "User not found."
       });
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
+    const connections = readConnections();
 
-    const user = {
+    const existing = connections.find(
+      connection =>
+        connection.senderId === senderId &&
+        connection.receiverId === receiverId
+    );
+
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: "Connection request already exists."
+      });
+    }
+
+    const reverseExisting = connections.find(
+      connection =>
+        connection.senderId === receiverId &&
+        connection.receiverId === senderId
+    );
+
+    if (reverseExisting) {
+      return res.status(409).json({
+        success: false,
+        message: "This user has already sent you a connection request."
+      });
+    }
+
+    const connection = {
       id: crypto.randomUUID(),
-      name: name.trim(),
-      email: normalizedEmail,
-      passwordHash,
-
-      profile: {
-        dateOfBirth: "",
-        gender: "",
-        interestedIn: "",
-        country: "",
-        state: "",
-        city: "",
-        bio: "",
-        photo: ""
-      },
-
+      senderId,
+      receiverId,
+      status: "pending",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
 
-    users.push(user);
-    saveUsers(users);
+    connections.push(connection);
+
+    saveConnections(connections);
 
     res.status(201).json({
       success: true,
-      message: "Account created successfully.",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email
+      message: "Connection request sent.",
+      connection: {
+        id: connection.id,
+        status: connection.status
       }
     });
 
   } catch (error) {
-    console.error("Signup error:", error);
+    console.error("Connection request error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Unable to create account."
+      message: "Unable to send connection request."
     });
   }
 });
 
+
 // --------------------------------------------------
-// CREATE / UPDATE PROFILE
+// GET RECEIVED CONNECTION REQUESTS
 // --------------------------------------------------
 
-app.put("/api/profile/:userId", (req, res) => {
-  try {
-    const { userId } = req.params;
+app.get(
+  "/api/connections/received/:userId",
+  (req, res) => {
 
-    const {
-      dateOfBirth,
-      gender,
-      interestedIn,
-      country,
-      state,
-      city,
-      bio,
-      photo
-    } = req.body;
+    try {
+      const userId = req.params.userId;
 
-    const users = readUsers();
+      const users = readUsers();
+      const connections = readConnections();
 
-    const userIndex = users.findIndex(
-      user => user.id === userId
-    );
+      const received = connections.filter(
+        connection =>
+          connection.receiverId === userId &&
+          connection.status === "pending"
+      );
 
-    if (userIndex === -1) {
-      return res.status(404).json({
+      const results = received.map(connection => {
+
+        const sender = users.find(
+          user => user.id === connection.senderId
+        );
+
+        return {
+          id: connection.id,
+          sender: sender
+            ? {
+                id: sender.id,
+                name: sender.name,
+                profile: sender.profile
+              }
+            : null,
+          createdAt: connection.createdAt
+        };
+
+      });
+
+      res.json({
+        success: true,
+        requests: results
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Received connections error:",
+        error
+      );
+
+      res.status(500).json({
         success: false,
-        message: "User not found."
+        message: "Unable to load connection requests."
       });
     }
-
-    users[userIndex].profile = {
-      dateOfBirth: dateOfBirth || "",
-      gender: gender || "",
-      interestedIn: interestedIn || "",
-      country: country || "",
-      state: state || "",
-      city: city || "",
-      bio: bio || "",
-      photo: photo || ""
-    };
-
-    users[userIndex].updatedAt =
-      new Date().toISOString();
-
-    saveUsers(users);
-
-    res.json({
-      success: true,
-      message: "Profile saved successfully.",
-      profile: users[userIndex].profile
-    });
-
-  } catch (error) {
-    console.error("Profile error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Unable to save profile."
-    });
   }
-});
+);
+
 
 // --------------------------------------------------
-// GET PROFILE
+// ACCEPT OR REJECT CONNECTION
 // --------------------------------------------------
 
-app.get("/api/profile/:userId", (req, res) => {
-  try {
-    const users = readUsers();
+app.put(
+  "/api/connections/:connectionId",
+  (req, res) => {
 
-    const user = users.find(
-      user => user.id === req.params.userId
-    );
+    try {
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found."
-      });
-    }
+      const { connectionId } = req.params;
+      const { action, userId } = req.body;
 
-    res.json({
-      success: true,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        profile: user.profile,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+      if (!["accept", "reject"].includes(action)) {
+        return res.status(400).json({
+          success: false,
+          message: "Action must be accept or reject."
+        });
       }
-    });
 
-  } catch (error) {
-    console.error("Get profile error:", error);
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: "User ID is required."
+        });
+      }
 
-    res.status(500).json({
-      success: false,
-      message: "Unable to load profile."
-    });
+      const connections = readConnections();
+
+      const connectionIndex =
+        connections.findIndex(
+          connection =>
+            connection.id === connectionId
+        );
+
+      if (connectionIndex === -1) {
+        return res.status(404).json({
+          success: false,
+          message: "Connection request not found."
+        });
+      }
+
+      const connection =
+        connections[connectionIndex];
+
+      if (connection.receiverId !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: "You cannot modify this request."
+        });
+      }
+
+      if (connection.status !== "pending") {
+        return res.status(409).json({
+          success: false,
+          message: "This request has already been processed."
+        });
+      }
+
+      connection.status =
+        action === "accept"
+          ? "accepted"
+          : "rejected";
+
+      connection.updatedAt =
+        new Date().toISOString();
+
+      saveConnections(connections);
+
+      res.json({
+        success: true,
+        message:
+          action === "accept"
+            ? "Connection accepted."
+            : "Connection rejected.",
+        status: connection.status
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Connection update error:",
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        message: "Unable to update connection."
+      });
+    }
   }
-});
+);
+
 
 // --------------------------------------------------
-// BASIC PROFILE SEARCH
+// GET ACCEPTED CONNECTIONS
 // --------------------------------------------------
 
-app.get("/api/discover", (req, res) => {
-  try {
-    const users = readUsers();
+app.get(
+  "/api/connections/:userId",
+  (req, res) => {
 
-    const {
-      country,
-      city,
-      gender,
-      interestedIn
-    } = req.query;
+    try {
 
-    let results = users.map(user => ({
-      id: user.id,
-      name: user.name,
-      profile: user.profile
-    }));
+      const userId = req.params.userId;
 
-    if (country) {
-      results = results.filter(
-        user =>
-          user.profile.country.toLowerCase() ===
-          country.toLowerCase()
+      const users = readUsers();
+      const connections = readConnections();
+
+      const accepted =
+        connections.filter(
+          connection =>
+            connection.status === "accepted" &&
+            (
+              connection.senderId === userId ||
+              connection.receiverId === userId
+            )
+        );
+
+      const results = accepted.map(connection => {
+
+        const otherUserId =
+          connection.senderId === userId
+            ? connection.receiverId
+            : connection.senderId;
+
+        const otherUser =
+          users.find(
+            user => user.id === otherUserId
+          );
+
+        if (!otherUser) {
+          return null;
+        }
+
+        return {
+          connectionId: connection.id,
+          user: {
+            id: otherUser.id,
+            name: otherUser.name,
+            profile: otherUser.profile
+          },
+          connectedAt: connection.updatedAt
+        };
+
+      }).filter(Boolean);
+
+      res.json({
+        success: true,
+        connections: results
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Accepted connections error:",
+        error
       );
+
+      res.status(500).json({
+        success: false,
+        message: "Unable to load connections."
+      });
     }
-
-    if (city) {
-      results = results.filter(
-        user =>
-          user.profile.city.toLowerCase() ===
-          city.toLowerCase()
-      );
-    }
-
-    if (gender) {
-      results = results.filter(
-        user =>
-          user.profile.gender.toLowerCase() ===
-          gender.toLowerCase()
-      );
-    }
-
-    if (interestedIn) {
-      results = results.filter(
-        user =>
-          user.profile.interestedIn.toLowerCase() ===
-          interestedIn.toLowerCase()
-      );
-    }
-
-    res.json({
-      success: true,
-      count: results.length,
-      users: results
-    });
-
-  } catch (error) {
-    console.error("Discover error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Unable to load profiles."
-    });
   }
-});
-
-// --------------------------------------------------
-// ROOT ROUTE
-// --------------------------------------------------
-
-app.get("/", (req, res) => {
-  const indexFile = path.join(
-    __dirname,
-    "public",
-    "index.html"
-  );
-
-  if (fs.existsSync(indexFile)) {
-    return res.sendFile(indexFile);
-  }
-
-  res.send(`
-    <h1>SM CONNECTS</h1>
-    <p>The server is running successfully.</p>
-    <p>API: <a href="/api/health">/api/health</a></p>
-  `);
-});
-
-// --------------------------------------------------
-// 404 HANDLER
-// --------------------------------------------------
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found."
-  });
-});
-
-// --------------------------------------------------
-// START SERVER
-// --------------------------------------------------
-
-app.listen(PORT, () => {
-  console.log("=================================");
-  console.log("       SM CONNECTS SERVER");
-  console.log("=================================");
-  console.log(`Server running on port ${PORT}`);
-});public/
+);connection request API
