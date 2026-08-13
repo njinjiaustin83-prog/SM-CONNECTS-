@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover | SM CONNECTS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="discover-page">
+
+    <header class="discover-header">
+      <h1>SM CONNECTS</h1>
+      <p>Discover people and make meaningful connections.</p>
+    </header>
+
+    <section class="filters">
+
+      <input
+        type="text"
+        id="country"
+        placeholder="Country"
+      >
+
+      <input
+        type="text"
+        id="city"
+        placeholder="City"
+      >
+
+      <select id="gender">
+        <option value="">Any gender</option>
+        <option value="man">Men</option>
+        <option value="woman">Women</option>
+        <option value="non-binary">Non-binary</option>
+      </select>
+
+      <select id="interestedIn">
+        <option value="">Any interest</option>
+        <option value="men">Interested in men</option>
+        <option value="women">Interested in women</option>
+        <option value="everyone">Interested in everyone</option>
+      </select>
+
+      <button id="searchButton">
+        Search
+      </button>
+
+    </section>
+
+    <p id="status"></p>
+
+    <section id="profiles" class="profiles-grid"></section>
+
+  </main>
+
+  <script>
+    const profilesContainer =
+      document.getElementById("profiles");
+
+    const status =
+      document.getElementById("status");
+
+    const searchButton =
+      document.getElementById("searchButton");
+
+    async function loadProfiles() {
+
+      status.textContent = "Loading profiles...";
+      profilesContainer.innerHTML = "";
+
+      const country =
+        document.getElementById("country").value.trim();
+
+      const city =
+        document.getElementById("city").value.trim();
+
+      const gender =
+        document.getElementById("gender").value;
+
+      const interestedIn =
+        document.getElementById("interestedIn").value;
+
+      const params = new URLSearchParams();
+
+      if (country) {
+        params.set("country", country);
+      }
+
+      if (city) {
+        params.set("city", city);
+      }
+
+      if (gender) {
+        params.set("gender", gender);
+      }
+
+      if (interestedIn) {
+        params.set("interestedIn", interestedIn);
+      }
+
+      try {
+
+        const response = await fetch(
+          `/api/discover?${params.toString()}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Unable to load profiles."
+          );
+        }
+
+        status.textContent =
+          `${data.count} profile(s) found.`;
+
+        if (data.users.length === 0) {
+
+          profilesContainer.innerHTML = `
+            <div class="empty-state">
+              <h2>No profiles found</h2>
+              <p>Try changing your search filters.</p>
+            </div>
+          `;
+
+          return;
+        }
+
+        data.users.forEach(user => {
+          createProfileCard(user);
+        });
+
+      } catch (error) {
+
+        status.textContent = error.message;
+
+      }
+    }
+
+    function createProfileCard(user) {
+
+      const profile = user.profile || {};
+
+      const card =
+        document.createElement("article");
+
+      card.className = "profile-card";
+
+      const photo =
+        profile.photo ||
+        "https://placehold.co/600x600?text=SM+CONNECTS";
+
+      const location =
+        [
+          profile.city,
+          profile.state,
+          profile.country
+        ]
+        .filter(Boolean)
+        .join(", ");
+
+      card.innerHTML = `
+        <img
+          src="${escapeHtml(photo)}"
+          alt="${escapeHtml(user.name)}"
+          class="profile-photo"
+          onerror="this.src='https://placehold.co/600x600?text=SM+CONNECTS'"
+        >
+
+        <div class="profile-info">
+
+          <h2>${escapeHtml(user.name)}</h2>
+
+          ${
+            location
+              ? `<p class="location">${escapeHtml(location)}</p>`
+              : ""
+          }
+
+          ${
+            profile.gender
+              ? `<p>Gender: ${escapeHtml(profile.gender)}</p>`
+              : ""
+          }
+
+          ${
+            profile.bio
+              ? `<p class="bio">${escapeHtml(profile.bio)}</p>`
+              : ""
+          }
+
+          <button
+            class="connect-button"
+            data-user-id="${escapeHtml(user.id)}"
+            data-user-name="${escapeHtml(user.name)}"
+          >
+            Connect
+          </button>
+
+        </div>
+      `;
+
+      const connectButton =
+        card.querySelector(".connect-button");
+
+      connectButton.addEventListener(
+        "click",
+        () => {
+
+          const name =
+            connectButton.dataset.userName;
+
+          alert(
+            `Connection request feature coming next for ${name}.`
+          );
+
+        }
+      );
+
+      profilesContainer.appendChild(card);
+    }
+
+    function escapeHtml(value) {
+
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    searchButton.addEventListener(
+      "click",
+      loadProfiles
+    );
+
+    loadProfiles();
+  </script>
+
+</body>
+</html>SM CONNECTS discover page
