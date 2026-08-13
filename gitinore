@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+data/users.json
+data/connections.json
+data/messages.json
+
+npm-debug.log*
+.DS_Store
+product gitinore 
