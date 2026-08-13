@@ -118,14 +118,62 @@ app.post("/api/login", async (req, res) => {
 
   } catch (error) {
     console.error("Login error:", error);
+app.post("/api/logout", (req, res) => {
+  req.session.destroy(error => {
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Unable to log out."
+      });
+    }
 
+    res.clearCookie("connect.sid");
+
+    res.json({
+      success: true,
+      message: "Logged out successfully."
+    });
+  });
+});
     res.status(500).json({
       success: false,
       message: "Unable to log in."
     });
   }
 });
+app.get("/api/me", (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({
+      success: false,
+      message: "Not logged in."
+    });
+  }
 
+  const users = readUsers();
+
+  const user = users.find(
+    user => user.id === req.session.userId
+  );
+
+  if (!user) {
+    req.session.destroy(() => {});
+
+    return res.status(401).json({
+      success: false,
+      message: "Account not found."
+    });
+  }
+
+  res.json({
+    success: true,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      profile: user.profile
+    }
+  });
+});
     if (!sender || !receiver) {
       return res.status(404).json({
         success: false,
