@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Login | SM CONNECTS</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="auth-container">
+
+    <section class="auth-card">
+
+      <h1>SM CONNECTS</h1>
+
+      <p>Welcome back.</p>
+
+      <form id="loginForm">
+
+        <label for="email">
+          Email address
+        </label>
+
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+
+        <label for="password">
+          Password
+        </label>
+
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Your password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button
+          type="submit"
+          id="loginButton"
+        >
+          Log In
+        </button>
+
+        <p id="message"></p>
+
+      </form>
+
+      <p>
+        Don't have an account?
+        <a href="signup.html">Create an account</a>
+      </p>
+
+    </section>
+
+  </main>
+
+  <script>
+    const loginForm =
+      document.getElementById("loginForm");
+
+    const loginButton =
+      document.getElementById("loginButton");
+
+    const message =
+      document.getElementById("message");
+
+    loginForm.addEventListener(
+      "submit",
+      async function (event) {
+
+        event.preventDefault();
+
+        const email =
+          document
+            .getElementById("email")
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById("password")
+            .value;
+
+        message.textContent = "";
+
+        loginButton.disabled = true;
+        loginButton.textContent = "Logging in...";
+
+        try {
+
+          const response = await fetch(
+            "/api/login",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                email,
+                password
+              })
+            }
+          );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.message ||
+              "Unable to log in."
+            );
+          }
+
+          // Store the logged-in user
+          localStorage.setItem(
+            "sm_connects_user",
+            JSON.stringify(data.user)
+          );
+
+          message.textContent =
+            "Login successful!";
+
+          setTimeout(() => {
+            window.location.href =
+              "discover.html";
+          }, 700);
+
+        } catch (error) {
+
+          message.textContent =
+            error.message;
+
+          loginButton.disabled = false;
+          loginButton.textContent = "Log In";
+        }
+      }
+    );
+  </script>
+
+</body>
+</html>SM CONNECTS login page 
