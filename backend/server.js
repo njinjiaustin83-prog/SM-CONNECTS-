@@ -655,4 +655,4 @@ app.listen(PORT, () => {
     `SM CONNECTS API running on port ${PORT}`
   );
 
-});feat: add SM CONNECTS authentication and API server
+});feat: connect API server to database layer
