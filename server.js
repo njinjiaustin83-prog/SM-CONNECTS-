@@ -65,6 +65,66 @@ app.post("/api/connections/request", (req, res) => {
     const receiver = users.find(
       user => user.id === receiverId
     );
+// --------------------------------------------------
+// LOGIN
+// --------------------------------------------------
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required."
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const users = readUsers();
+
+    const user = users.find(
+      user => user.email === normalizedEmail
+    );
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password."
+      });
+    }
+
+    const passwordMatches = await bcrypt.compare(
+      password,
+      user.passwordHash
+    );
+
+    if (!passwordMatches) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password."
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Login successful.",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    console.error("Login error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to log in."
+    });
+  }
+});
 
     if (!sender || !receiver) {
       return res.status(404).json({
@@ -361,3 +421,4 @@ app.get(
     }
   }
 );connection request API
+);Add login Api
