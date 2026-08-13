@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+localStorage.setItem(
+  "sm_connects_user",
+  JSON.stringify(data.user)
+);<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -99,8 +102,8 @@
     const saveButton = document.getElementById("saveButton");
 
     const storedUser =
-      localStorage.getItem("sm_connects_user");
-
+      // Authentication is now stored in the server session.
+// No password or authentication token is stored in localStorage.
     if (!storedUser) {
       message.textContent =
         "Please create an account first.";
