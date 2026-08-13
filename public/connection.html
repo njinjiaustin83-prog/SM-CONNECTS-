@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connections | SM CONNECTS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="connections-page">
+
+    <header>
+      <h1>SM CONNECTS</h1>
+      <h2>My Connections</h2>
+      <p>Manage your connection requests.</p>
+    </header>
+
+    <section>
+      <h2>Connection Requests</h2>
+      <p id="requestStatus">Loading...</p>
+      <div id="requests"></div>
+    </section>
+
+    <section>
+      <h2>My Connections</h2>
+      <p id="connectionStatus">Loading...</p>
+      <div id="connections"></div>
+    </section>
+
+    <p>
+      <a href="discover.html">Back to Discover</a>
+    </p>
+
+  </main>
+
+  <script>
+    const requestsContainer =
+      document.getElementById("requests");
+
+    const connectionsContainer =
+      document.getElementById("connections");
+
+    const requestStatus =
+      document.getElementById("requestStatus");
+
+    const connectionStatus =
+      document.getElementById("connectionStatus");
+
+    function getCurrentUser() {
+      const storedUser =
+        localStorage.getItem("sm_connects_user");
+
+      if (!storedUser) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        return null;
+      }
+    }
+
+    async function loadRequests() {
+
+      const user = getCurrentUser();
+
+      if (!user || !user.id) {
+        requestStatus.textContent =
+          "Please create an account first.";
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          `/api/connections/received/${encodeURIComponent(user.id)}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Unable to load requests."
+          );
+        }
+
+        requestsContainer.innerHTML = "";
+
+        if (data.requests.length === 0) {
+          requestStatus.textContent =
+            "You have no pending requests.";
+          return;
+        }
+
+        requestStatus.textContent =
+          `${data.requests.length} pending request(s).`;
+
+        data.requests.forEach(request => {
+
+          if (!request.sender) return;
+
+          const card =
+            document.createElement("article");
+
+          card.className = "connection-card";
+
+          card.innerHTML = `
+            <h3>
+              ${escapeHtml(request.sender.name)}
+            </h3>
+
+            <p>
+              ${
+                escapeHtml(
+                  request.sender.profile?.city || ""
+                )
+              }
+            </p>
+
+            <button
+              class="accept-button"
+              data-id="${escapeHtml(request.id)}"
+            >
+              Accept
+            </button>
+
+            <button
+              class="reject-button"
+              data-id="${escapeHtml(request.id)}"
+            >
+              Reject
+            </button>
+          `;
+
+          card
+            .querySelector(".accept-button")
+            .addEventListener(
+              "click",
+              () => updateRequest(
+                request.id,
+                "accept"
+              )
+            );
+
+          card
+            .querySelector(".reject-button")
+            .addEventListener(
+              "click",
+              () => updateRequest(
+                request.id,
+                "reject"
+              )
+            );
+
+          requestsContainer.appendChild(card);
+        });
+
+      } catch (error) {
+
+        requestStatus.textContent =
+          error.message;
+      }
+    }
+
+    async function updateRequest(
+      connectionId,
+      action
+    ) {
+
+      const user = getCurrentUser();
+
+      if (!user || !user.id) {
+        alert("Please create an account first.");
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          `/api/connections/${encodeURIComponent(connectionId)}`,
+          {
+            method: "PUT",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              action,
+              userId: user.id
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Unable to update request."
+          );
+        }
+
+        await loadRequests();
+        await loadConnections();
+
+      } catch (error) {
+
+        alert(error.message);
+      }
+    }
+
+    async function loadConnections() {
+
+      const user = getCurrentUser();
+
+      if (!user || !user.id) {
+        connectionStatus.textContent =
+          "Please create an account first.";
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          `/api/connections/${encodeURIComponent(user.id)}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Unable to load connections."
+          );
+        }
+
+        connectionsContainer.innerHTML = "";
+
+        if (data.connections.length === 0) {
+          connectionStatus.textContent =
+            "You don't have any connections yet.";
+          return;
+        }
+
+        connectionStatus.textContent =
+          `${data.connections.length} connection(s).`;
+
+        data.connections.forEach(connection => {
+
+          const userProfile =
+            connection.user;
+
+          const card =
+            document.createElement("article");
+
+          card.className = "connection-card";
+
+          card.innerHTML = `
+            <h3>
+              ${escapeHtml(userProfile.name)}
+            </h3>
+
+            <p>
+              ${
+                escapeHtml(
+                  userProfile.profile?.city || ""
+                )
+              }
+            </p>
+
+            <p>
+              Connected successfully.
+            </p>
+          `;
+
+          connectionsContainer.appendChild(card);
+        });
+
+      } catch (error) {
+
+        connectionStatus.textContent =
+          error.message;
+      }
+    }
+
+    function escapeHtml(value) {
+
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    loadRequests();
+    loadConnections();
+  </script>
+
+</body>
+</html>connections page 
